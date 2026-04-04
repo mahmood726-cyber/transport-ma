@@ -262,16 +262,28 @@ function transportEffect(trials, target) {
   }
 
   // Step 6: Variance estimation (sandwich)
-  // Var(tau) ≈ sum(wSampling_i^2 * (yi - mTrial_i)^2) + Var(mTarget)
+  // Var(tau_AIPW) ≈ sum(wSampling_i^2 * (yi - mTrial_i)^2) + x_target' (X'WX)^{-1} x_target
   var varResid = 0;
   for (var i = 0; i < k; i++) {
     var resid = y[i] - mTrial[i];
     varResid += wSampling[i] * wSampling[i] * (resid * resid + trials[i].se * trials[i].se);
   }
-  // Add prediction variance at target
-  // Simplified: use average trial variance scaled by effective sample size
+  // Prediction variance at target: x_target' (X'WX)^{-1} x_target
+  // Invert XtWX to get covariance matrix of beta
   var nEff = 1 / wSampling.reduce(function(a,w){return a+w*w;}, 0);
-  var varPred = mTarget * mTarget / (k * nEff) + varResid;
+  var XtWXinv = invertMatrix(XtWX);
+  var varMTarget = 0;
+  if (XtWXinv) {
+    for (var j = 0; j < p; j++) {
+      for (var l = 0; l < p; l++) {
+        varMTarget += xTarget[j] * XtWXinv[j][l] * xTarget[l];
+      }
+    }
+  } else {
+    // Fallback if inversion fails: use residual-based estimate
+    varMTarget = varResid / nEff;
+  }
+  var varPred = varMTarget + varResid;
   var seTransport = Math.sqrt(Math.max(varPred, 1e-9));
 
   // Step 7: Standard (non-transported) pooled estimate for comparison
@@ -321,6 +333,35 @@ function solveLinear(A, b) {
     x[row] /= M[row][row];
   }
   return x;
+}
+
+// Invert a square matrix via Gauss-Jordan elimination
+function invertMatrix(A) {
+  var n = A.length;
+  // Augment with identity
+  var M = A.map(function(row, i) {
+    var aug = row.slice();
+    for (var j = 0; j < n; j++) aug.push(i === j ? 1 : 0);
+    return aug;
+  });
+  for (var col = 0; col < n; col++) {
+    var maxRow = col;
+    for (var row = col + 1; row < n; row++) {
+      if (Math.abs(M[row][col]) > Math.abs(M[maxRow][col])) maxRow = row;
+    }
+    var tmp = M[col]; M[col] = M[maxRow]; M[maxRow] = tmp;
+    if (Math.abs(M[col][col]) < 1e-12) return null;
+    var pivot = M[col][col];
+    for (var j = 0; j < 2 * n; j++) M[col][j] /= pivot;
+    for (var row = 0; row < n; row++) {
+      if (row === col) continue;
+      var f = M[row][col];
+      for (var j = 0; j < 2 * n; j++) M[row][j] -= f * M[col][j];
+    }
+  }
+  var inv = [];
+  for (var i = 0; i < n; i++) inv.push(M[i].slice(n, 2 * n));
+  return inv;
 }
 
 // === SENSITIVITY ANALYSIS ===
