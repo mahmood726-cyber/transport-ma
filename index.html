@@ -80,10 +80,10 @@ canvas{width:100%;border-radius:8px;background:var(--surface)}
   <div class="card">
     <h2>Target Population Profile</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-      <div><label style="font-size:11px;color:var(--text2)">Mean Age</label><input type="number" id="tgtAge" value="72" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
-      <div><label style="font-size:11px;color:var(--text2)">% Male</label><input type="number" id="tgtMale" value="55" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
-      <div><label style="font-size:11px;color:var(--text2)">% Diabetes</label><input type="number" id="tgtDM" value="45" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
-      <div><label style="font-size:11px;color:var(--text2)">Baseline Risk (%)</label><input type="number" id="tgtRisk" value="25" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
+      <div><label style="font-size:11px;color:var(--text2)">Mean Age</label><input type="number" id="tgtAge" aria-label="Target mean age" value="72" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
+      <div><label style="font-size:11px;color:var(--text2)">% Male</label><input type="number" id="tgtMale" aria-label="Target percent male" value="55" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
+      <div><label style="font-size:11px;color:var(--text2)">% Diabetes</label><input type="number" id="tgtDM" aria-label="Target percent diabetes" value="45" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
+      <div><label style="font-size:11px;color:var(--text2)">Baseline Risk (%)</label><input type="number" id="tgtRisk" aria-label="Target baseline risk percent" value="25" style="width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--mono)"></div>
     </div>
     <div style="margin-top:14px"><button class="btn btn-accent" onclick="runTransport()">Transport to Target Population</button></div>
   </div>
@@ -508,14 +508,14 @@ function renderTrials(){
   var tb=document.getElementById('trialBody');tb.innerHTML='';
   state.trials.forEach(function(t,i){
     var tr=document.createElement('tr');
-    tr.innerHTML='<td><input value="'+(t.trial||'')+'" oninput="state.trials['+i+'].trial=this.value" style="width:120px"></td>'+
-      '<td><input type="number" value="'+(t.logEffect??'')+'" oninput="state.trials['+i+'].logEffect=+this.value" style="width:70px"></td>'+
-      '<td><input type="number" value="'+(t.se??'')+'" oninput="state.trials['+i+'].se=+this.value" style="width:60px"></td>'+
-      '<td><input type="number" value="'+(t.age??'')+'" oninput="state.trials['+i+'].age=+this.value" style="width:50px"></td>'+
-      '<td><input type="number" value="'+(t.male??'')+'" oninput="state.trials['+i+'].male=+this.value" style="width:50px"></td>'+
-      '<td><input type="number" value="'+(t.dm??'')+'" oninput="state.trials['+i+'].dm=+this.value" style="width:50px"></td>'+
-      '<td><input type="number" value="'+(t.risk??'')+'" oninput="state.trials['+i+'].risk=+this.value" style="width:50px"></td>'+
-      '<td><input type="number" value="'+(t.n??'')+'" oninput="state.trials['+i+'].n=+this.value" style="width:60px"></td>'+
+    tr.innerHTML='<td><input aria-label="Trial name" value="'+(t.trial||'')+'" oninput="state.trials['+i+'].trial=this.value" style="width:120px"></td>'+
+      '<td><input aria-label="Log effect" type="number" value="'+(t.logEffect??'')+'" oninput="state.trials['+i+'].logEffect=+this.value" style="width:70px"></td>'+
+      '<td><input aria-label="Standard error" type="number" value="'+(t.se??'')+'" oninput="state.trials['+i+'].se=+this.value" style="width:60px"></td>'+
+      '<td><input aria-label="Trial mean age" type="number" value="'+(t.age??'')+'" oninput="state.trials['+i+'].age=+this.value" style="width:50px"></td>'+
+      '<td><input aria-label="Trial percent male" type="number" value="'+(t.male??'')+'" oninput="state.trials['+i+'].male=+this.value" style="width:50px"></td>'+
+      '<td><input aria-label="Trial percent diabetes" type="number" value="'+(t.dm??'')+'" oninput="state.trials['+i+'].dm=+this.value" style="width:50px"></td>'+
+      '<td><input aria-label="Trial baseline risk" type="number" value="'+(t.risk??'')+'" oninput="state.trials['+i+'].risk=+this.value" style="width:50px"></td>'+
+      '<td><input aria-label="Trial sample size" type="number" value="'+(t.n??'')+'" oninput="state.trials['+i+'].n=+this.value" style="width:60px"></td>'+
       '<td><button class="del-btn" onclick="state.trials.splice('+i+',1);renderTrials()">\u2715</button></td>';
     tb.appendChild(tr);
   });
